@@ -23,6 +23,10 @@ response = client.chat.completions.create(
     ],
 )
 
+if response.usage is not None:
+    print(f"Prompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}")
+else:
+    raise RuntimeError("No usage metadata stored in response")
 
 def main():
     print(response.choices[0].message.content)
