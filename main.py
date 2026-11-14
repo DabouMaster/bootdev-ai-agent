@@ -15,6 +15,7 @@ client = OpenAI(
 
 parser = argparse.ArgumentParser(description="Chatbot")
 parser.add_argument("user_prompt", type=str, help="User prompt")
+parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
 args = parser.parse_args()
 
 messages = [
@@ -26,14 +27,17 @@ response = client.chat.completions.create(
     messages=messages,
 )
 
-if response.usage is not None:
-    print(f"Prompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}")
-else:
-    raise RuntimeError("No usage metadata stored in response")
+
 
 def main():
-    print(response.choices[0].message.content)
-
+    if response.usage is not None and args.verbose:
+        print(f"User prompt: {args.user_prompt}")
+        print(f"Prompt tokens: {response.usage.prompt_tokens}\nResponse tokens: {response.usage.completion_tokens}")
+        print(response.choices[0].message.content)
+    elif response.usage is not None and not args.verbose:
+        print(response.choices[0].message.content)
+    elif response.usage is None:
+        raise RuntimeError("No usage metadata stored in response")
 
 if __name__ == "__main__":
     main()
